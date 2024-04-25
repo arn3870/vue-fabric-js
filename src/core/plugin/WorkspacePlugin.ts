@@ -89,28 +89,13 @@ class WorkspacePlugin {
   // 初始化画布
   _initWorkspace() {
     const { width, height } = this.option;
-    // Create a red rectangle with rounded corners slightly larger than the workspace
-    const backgroundRect = new fabric.Rect({
-      fill: 'red',
-      width: width + 20, // Add 20px to width and height for a bigger size
-      height: height + 20,
-      rx: 20, // Set rounded corners with radius 20px
-      ry: 20,
-      selectable: false,
-      hasControls: false,
-      hoverCursor: 'default',
-    });
-
-    // Add the background rectangle to the canvas behind the workspace
-    this.canvas.add(backgroundRect);
-
     const workspace = new fabric.Rect({
-      fill: 'rgba(255,255,255,1)',
+      fill: '#E0E3EC',
       width: width,
       height,
       id: 'workspace',
       stroke: '#E0E3EC',
-      strokeWidth: 80,
+      strokeWidth: 0,
       rx: 30,
       ry: 30,
     });
@@ -119,13 +104,52 @@ class WorkspacePlugin {
     workspace.hoverCursor = 'default';
     this.canvas.add(workspace);
 
+    // Add pages
+    const pageMargin = 60; // Adjust this to change the size of the pages relative to the workspace
+    const pageGap = 20; // Adjust this to change the gap between the pages
+    const pageWidth = (width - 2 * pageMargin - pageGap) / 2;
+    const pageHeight = height - 2 * pageMargin;
+    const pageColor = 'white';
+    const pageShadow = new fabric.Shadow({
+      color: 'rgba(0,0,0,0.3)',
+      blur: 15,
+      offsetX: 0, // Set offsetX to 0
+      offsetY: 0, // Set offsetY to 0
+    });
+
+    const page1 = new fabric.Rect({
+      fill: pageColor,
+      width: pageWidth,
+      height: pageHeight,
+      left: pageMargin,
+      top: pageMargin,
+      shadow: pageShadow,
+    });
+    page1.set('selectable', false);
+    page1.set('hasControls', false);
+    page1.hoverCursor = 'default';
+    this.canvas.add(page1);
+
+    const page2 = new fabric.Rect({
+      fill: pageColor,
+      width: pageWidth,
+      height: pageHeight,
+      left: pageWidth + pageMargin + pageGap, // Decrease the gap between the two pages
+      top: pageMargin,
+      shadow: pageShadow,
+    });
+    page2.set('selectable', false);
+    page2.set('hasControls', false);
+    page2.hoverCursor = 'default';
+    this.canvas.add(page2);
+    this.canvas.add(page2);
     // Add tabs
     const tabWidth = 60;
     const tabHeight = 200;
     const numberOfTabs = 11;
     for (let i = 0; i < numberOfTabs; i++) {
       const tab = new fabric.Rect({
-        fill: 'red', // Make the color red
+        fill: 'green', // Make the color red
         width: tabWidth,
         height: tabHeight,
         left: workspace.width - tabWidth + 20, // Position the tab on the right side but inside the workspace
@@ -135,21 +159,6 @@ class WorkspacePlugin {
       // Do not set 'selectable' and 'hasControls' to false
       this.canvas.add(tab);
     }
-
-    // Add a gap in the center of the workspace
-    const gapWidth = 80; // Adjust this to change the width of the gap
-    const gap = new fabric.Rect({
-      fill: 'transparent', // Make the gap transparent
-      stroke: '#E0E3EC', // Same border as the workspace
-      strokeWidth: 20,
-      width: gapWidth,
-      height: height,
-      left: (width - gapWidth) / 2, // Position the gap in the center of the workspace
-      id: 'gapRect',
-    });
-    gap.set('selectable', false);
-    gap.set('hasControls', false);
-    this.canvas.add(gap);
 
     // Add the spiral binding SVG
     fabric.Image.fromURL(spiralBinding, (img) => {
@@ -221,10 +230,10 @@ class WorkspacePlugin {
     this.setCenterFromObject(this.workspace);
 
     // 超出画布不展示
-    this.workspace.clone((cloned: fabric.Rect) => {
-      this.canvas.clipPath = cloned;
-      this.canvas.requestRenderAll();
-    });
+    // this.workspace.clone((cloned: fabric.Rect) => {
+    //   this.canvas.clipPath = cloned;
+    //   this.canvas.requestRenderAll();
+    // });
     if (cb) cb(this.workspace.left, this.workspace.top);
   }
 
